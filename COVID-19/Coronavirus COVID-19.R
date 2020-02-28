@@ -4,9 +4,11 @@ library(lubridate)
 library(ggtext)
 
 
-confirmados <- readr::read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/time_series/time_series_2019-ncov-Confirmed.csv")
-muertes <- readr::read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/time_series/time_series_2019-ncov-Deaths.csv")
-recuperados <- readr::read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/time_series/time_series_2019-ncov-Recovered.csv")
+confirmados <- readr::read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv")
+muertes <- readr::read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv")
+recuperados <- readr::read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv")
+
+
 
 head(confirmados)
 names(confirmados)
@@ -29,8 +31,7 @@ bd_casos %>%
   summarize(n_casos = sum(casos)) %>% 
   summarize(total = max(n_casos)) %>% #hay dias con varios registros, como los datos son acumulados se debe dejar el último registro del día usando max()
   #mutate(casos.nuevos.x = c(0,diff(total))) %>%  #https://stackoverflow.com/questions/35169423/error-when-using-diff-function-inside-of-dplyr-mutate (idea original)
-  mutate(casos.nuevos = c(total[1],diff(total))) %>% 
-  view
+  mutate(casos.nuevos = c(total[1],diff(total)))
 
 
 #Grafico de casos nuevos y acumulados (global) ----
@@ -64,7 +65,7 @@ bd_casos %>%
         plot.caption = element_text(size=9, color="grey70")) +
   geom_label(aes(x = ymd("2020-02-10")+0.6 , y = 23000, label = "Cambio en metodología para\n contabilizar nuevos casos \n(OMS)"),  hjust = 0.5, vjust = 0.5, 
              lineheight = 1, fill = "grey97", label.size = NA, size = 3) +
-  geom_curve(aes(x = ymd("2020-02-10")+0.9, y = 19500, xend = ymd("2020-02-11")+0.8, yend = 15500), colour = "grey50", curvature = 0.1, size=0.3,
+  geom_curve(aes(x = ymd("2020-02-10")+0.9, y = 19500, xend = ymd("2020-02-12")+0.8, yend = 15500), colour = "grey50", curvature = 0.1, size=0.3,
              arrow = arrow(length = unit(0.03, "npc")))
 )  
 
@@ -162,7 +163,7 @@ ggsave("Covid-19_casos_comparacion.png", p2, width = 30, height = 15, units = "c
   geom_line(aes(fecha_ok, razon), color="green4", lwd=.8) +
   geom_point(aes(fecha_ok, razon), shape=21, color="green4", fill="white",size=2) +
   scale_x_date(date_breaks = "1 day", date_labels = "%b-%d", expand = c(0.03, 0.03)) +
-  scale_y_continuous(expand = c(0.02,0.02), limits =  c(0,5)) +
+  scale_y_continuous(expand = c(0.05,0.05), breaks=seq(0,100000,1)) +
   labs(title = "**Coronavirus COVID-19:** Relación entre el número de pacientes recuperados y fallecidos",
        subtitle = str_glue("Cálculo en base a valores acumulados en cada día. *Actualización {now()}*"),
        y="Razón (recuperados/fallecidos)\n",
